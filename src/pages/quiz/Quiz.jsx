@@ -1,4 +1,4 @@
- import { Box, Button, Paper, Typography, Grid } from "@mui/material";
+ import { Box, Button, Grid, Paper, Typography } from "@mui/material";
 import { useState } from "react";
 import CustomSelect from "./compoennts/DropDown";
 
@@ -8,131 +8,183 @@ export default function QuizPage() {
   const [type, setType] = useState("any");
   const [questions, setQuestions] = useState(5);
 
+  const options = ["Option 1", "Option 2", "Option 3", "Option 4"];
+
   return (
-    <Box
-      sx={{
-        height: "100dvh",
-        background: "#F4F6FA",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      
+   <Box
+  sx={{
+    minHeight: "100vh",
+    py: 3,
+    px: 2,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    bgcolor: "#dfeaebff", // light gray background
+  }}
+>
 
-      {/* MAIN CONTENT */}
-      <Box
-        sx={{
-          flex: 1,
-          overflow: "hidden",
-          padding: 2,
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          alignItems: "center",
-        }}
+      {/* TOP FILTERS + RESTART */}
+      <Grid
+        container
+        spacing={2}
+        justifyContent="center"
+        alignItems="center"
+        sx={{ mb: 5, maxWidth: 1200 }}
       >
-        {/* FILTER BOX */}
-        <Paper
-          elevation={3}
-          sx={{
-            width: "100%",
-            maxWidth: 800,
-            padding: 2,
-            borderRadius: 2,
-          }}
-        >
-          <Grid container spacing={2}>
-            <Grid item xs={6} sm={3}>
-              <CustomSelect
-                label="Category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                options={[
-                  { value: "any", label: "Any Category" },
-                  { value: "9", label: "General Knowledge" },
-                  { value: "10", label: "Books" },
-                  { value: "11", label: "Film" },
-                  { value: "12", label: "Sports" },
-                ]}
-              />
-            </Grid>
+        <Grid item xs={12} sm={3}>
+          <CustomSelect
+            label="Category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            options={[
+              { value: "any", label: "Any Category" },
+              { value: "9", label: "General Knowledge" },
+              { value: "10", label: "Books" },
+              { value: "11", label: "Film" },
+              { value: "12", label: "Sports" },
+            ]}
+          />
+        </Grid>
 
-            <Grid item xs={6} sm={3}>
-              <CustomSelect
-                label="Difficulty"
-                value={difficulty}
-                onChange={(e) => setDifficulty(e.target.value)}
-                options={[
-                  { value: "any", label: "Any Difficulty" },
-                  { value: "easy", label: "Easy" },
-                  { value: "medium", label: "Medium" },
-                  { value: "hard", label: "Hard" },
-                ]}
-              />
-            </Grid>
+        <Grid item xs={12} sm={3}>
+          <CustomSelect
+            label="Difficulty"
+            value={difficulty}
+            onChange={(e) => setDifficulty(e.target.value)}
+            options={[
+              { value: "any", label: "Any Difficulty" },
+              { value: "easy", label: "Easy" },
+              { value: "medium", label: "Medium" },
+              { value: "hard", label: "Hard" },
+            ]}
+          />
+        </Grid>
 
-            <Grid item xs={6} sm={3}>
-              <CustomSelect
-                label="Type"
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-                options={[
-                  { value: "any", label: "Any Type" },
-                  { value: "multiple", label: "Multiple Choice" },
-                  { value: "boolean", label: "True/False" },
-                ]}
-              />
-            </Grid>
+        <Grid item xs={12} sm={3}>
+          <CustomSelect
+            label="Type"
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            options={[
+              { value: "any", label: "Any Type" },
+              { value: "multiple", label: "Multiple Choice" },
+              { value: "boolean", label: "True/False" },
+            ]}
+          />
+        </Grid>
 
-            <Grid item xs={6} sm={3}>
-              <CustomSelect
-                label="Questions"
-                value={questions}
-                onChange={(e) => setQuestions(e.target.value)}
-                options={[5,10,15,20,25,30,35,40,45,50].map((n) => ({
-                  value: n,
-                  label: n,
-                }))}
-              />
-            </Grid>
-            <Grid><Button variant="outlined" color="error" sx={{ mt: 1, mx:3 }}>
-          Restart
-        </Button></Grid>
-          </Grid>
-        </Paper>
+        <Grid item xs={12} sm={3}>
+          <CustomSelect
+            label="Questions"
+            value={questions}
+            onChange={(e) => setQuestions(e.target.value)}
+            options={[5, 10, 15, 20, 25, 30].map((n) => ({
+              value: n,
+              label: n,
+            }))}
+          />
+        </Grid>
 
-        {/* QUESTION CARD */}
-        <Paper
-          elevation={3}
-          sx={{
-            width: "50%",
-            maxWidth: 800,
-            padding: 3,
-            borderRadius: 2,
-            textAlign: "center",
-            flexShrink: 0,
-          }}
-        >
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            Q1. Your Question Here
-          </Typography>
-
-          <Box sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 1.5 }}>
-            <Button variant="contained" fullWidth>Option 1</Button>
-            <Button variant="contained" fullWidth>Option 2</Button>
-            <Button variant="contained" fullWidth>Option 3</Button>
-            <Button variant="contained" fullWidth>Option 4</Button>
-          </Box>
-
-          {/* SUBMIT BUTTON UNDER QUESTION */}
+         <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
           <Button
-            variant="outlined"
-            color="success"
-            sx={{ mt: 3, width: "50%" }}
+            variant="contained"
+            color="error"
+            sx={{
+              px: 3,
+              py: 1.5,
+              fontWeight: 600,
+              borderRadius: 3,
+              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+              transition: "all 0.3s",
+              "&:hover": {
+                transform: "scale(1.05)",
+              },
+            }}
           >
-            Submit
+            Restart
           </Button>
-        </Paper>
+        </Grid>
+      </Grid>
+
+      {/* QUESTION CARD */}
+     <Paper
+  elevation={16}
+  sx={{
+    width: "90%", 
+    maxWidth: 600,
+     p: 2,  // overall padding
+    pb:5, 
+    borderRadius: 4,
+    display: "flex",
+    flexDirection: "column",
+    gap: 5,
+    bgcolor: "#cddbdeff",
+    mx: "auto", 
+  }}
+>
+
+        <Typography
+          variant="h6"
+          align="center"
+          sx={{ fontWeight: 600, color: "#333"}}
+        >
+          Q1. A concise response, often used in exams or quizzes, requiring just a couple of sentences to directly address a factual or interpretive question.
+        </Typography>
+
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 2,
+            justifyContent: "center",
+            maxWidth: 400,
+            margin: "0 auto",
+            
+          }}
+        >
+          {options.map((option, index) => (
+            <Button
+              key={index}
+              variant="outlined"
+              sx={{
+                flex: "0 0 48%",
+                height: 60,
+                borderRadius: 2,
+                fontWeight: 500,
+                color: "#1976d2",
+                borderColor: "#1976d2",
+                transition: "all 0.3s",
+                "&:hover": {
+                  backgroundColor: "#1976d2",
+                  color: "#fff",
+                
+                  
+                },
+              }}
+            >
+              {option}
+            </Button>
+          ))}
+        </Box>
+      </Paper>
+
+      {/* SUBMIT BUTTON */}
+      <Box display="flex" justifyContent="center" mt={2}>
+        <Button
+          variant="contained"
+          color="success"
+          sx={{
+            px: 3,
+            py: 1,
+            fontWeight: 600,
+            fontSize: 16,
+            borderRadius: 3,
+            boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
+            
+          }}
+        >
+          Submit
+        </Button>
       </Box>
     </Box>
   );
