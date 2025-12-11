@@ -1,7 +1,7 @@
- import PsychologyIcon from "@mui/icons-material/Psychology";
+import PsychologyIcon from "@mui/icons-material/Psychology";
 import { Button, Container, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import "./Home.css"; 
+import "./Home.css";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -18,8 +18,8 @@ export default function Home() {
         </Typography>
 
         <Typography variant="h6" className="subtitle">
-          Challenge your knowledge with beautiful interactive quizzes.
-          Enhance your skills every single day.
+          Challenge your knowledge with beautiful interactive quizzes. Enhance
+          your skills every single day.
         </Typography>
 
         <Button

@@ -22,7 +22,7 @@ html, body {
 
   background: linear-gradient(135deg, #1b084a, #6a00ff, #ff0066);
   background-size: 400% 400%;
-  /* animation: bg-animation 10s ease infinite; */
+  animation: bg-animation 10s ease infinite;
 }
 
 @keyframes bg-animation {
@@ -49,7 +49,7 @@ html, body {
   font-size: 120px;
   fill: #ffffff;
   filter: drop-shadow(0px 0px 15px rgba(255, 255, 255, 0.7));
-  /* animation: pulse 3s infinite ease-in-out; */
+  animation: pulse 3s infinite ease-in-out;
 }
 
 @keyframes pulse {
