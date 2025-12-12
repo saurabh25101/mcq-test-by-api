@@ -1,4 +1,4 @@
-/* Full page container */
+/* Full page container
 .quiz-container {
   min-height: 100vh;
  padding: 20px;
@@ -10,7 +10,7 @@
 }
 
 /* Filter section grid */
-.filter-grid {
+/* .filter-grid {
   max-width: 1200px;
   margin-bottom: 40px;
 }
@@ -23,10 +23,10 @@
   background: linear-gradient(45deg, #ff4081, #b52da5) !important;
   color: #f3f7f9 !important;
 
-  transition: 0.25s ease;
+  transition: 0.25s ease; */
 
   /* Fixed width */
-  height: 50px;
+  /* height: 50px;
   width: 120px; 
   
   min-width: 180px;  
@@ -42,37 +42,37 @@
   padding: 0px  0px 00px;
   border-radius: 20px;
   background: #ecfaff94 !important; /* ← important lagao */
-  display: flex;
+  /* display: flex;
   flex-direction: column;
   padding: 20px;
 
-}
+} */ 
 
 /* Question text */
-.question-text {
+/* .question-text {
   font-weight: 600;
   color: #333;
   text-align: center;
-}
+} */
 
-/* Options wrapper */
+/* Options wrapper
  .option-btn {
   flex: 1 1 48%;   /* 48% width → 2 buttons per row */
-  max-width: 40%;
+  /* max-width: 40%;
   min-width: 120px;
   height: 50px;
-}
-.options-wrapper {
+/* } */
+/* .options-wrapper {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   justify-content: center;
-}
+} */ 
 
  
 
 /* Submit button */
-.submit-wrapper {
+/* .submit-wrapper {
   display: flex;
   justify-content: center;
   margin-top: 20px;
@@ -92,4 +92,4 @@
   background: #00c853 !important;
   color: white !important;
   border-color: #00c853 !important;
-}
+} */ 

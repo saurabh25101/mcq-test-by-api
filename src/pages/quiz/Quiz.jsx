@@ -1,39 +1,58 @@
 import { Box, Button, Grid, Paper, Typography } from "@mui/material";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Loader from "./compoennts/Loader";
 import WarningDialog from "../WarningDialogBox";
 import CustomSelect from "./compoennts/DropDown";
-import "./Quiz.css";
 import { getQuestions } from "../../question-Service.js/Api";
-import { useNavigate } from "react-router-dom";
 
 export default function QuizPage() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+
+  // --- states ---
+  const [loading, setLoading] = useState(false);
+  const [quizStarted, setQuizStarted] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [pendingChange, setPendingChange] = useState(null);
+  const [count, setCount] = useState(0);
+  const [quizData, setQuizData] = useState([]);
+  const [answers, setAnswers] = useState({});
+
+  // --- filter states ---
   const [category, setCategory] = useState("any");
   const [difficulty, setDifficulty] = useState("any");
   const [type, setType] = useState("any");
   const [questions, setQuestions] = useState(5);
 
-  const [quizStarted, setQuizStarted] = useState(false);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [pendingChange, setPendingChange] = useState(null);
+  // --- shuffle array ---
+  const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
 
-  const [count, setCount] = useState(0);
-  const [quizData, setQuizData] = useState([]);
+  // --- prepare quiz questions ---
+  const prepareQuestions = (results) =>
+    results.map((q) => {
+      const allOptions = shuffle([
+        q.correct_answer,
+        ...(q.incorrect_answers || []),
+      ]);
+      return { ...q, allOptions };
+    });
 
-  // save seleted option
-  const [answers, setAnswers] = useState({});
-
-  const options = ["Option 1", "Option 2", "Option 3", "Option 4"];
-
-  // --- SELECT OPTION ----
+  // --- select/deselect option ---
   const handleSelectOption = (option) => {
-    setAnswers({
-      ...answers,
-      [count]: option, // current question ka selected option
+    setAnswers((prev) => {
+      const current = prev[count];
+      if (current === option) return { ...prev, [count]: null }; // deselect
+      return { ...prev, [count]: option };
     });
   };
 
-  // Filter change
+  // --- skip question ---
+  const handleSkip = () => {
+    setAnswers((prev) => ({ ...prev, [count]: prev[count] ?? null }));
+    if (count < quizData.length - 1) setCount((c) => c + 1);
+  };
+
+  // --- handle filter changes ---
   const handleFilterChange = (field, value) => {
     if (quizStarted) {
       setPendingChange({ field, value });
@@ -50,11 +69,14 @@ export default function QuizPage() {
     if (field === "questions") setQuestions(value);
   };
 
-  //Start  Restart btn
+  // --- start/restart quiz ---
   const handleStartRestart = async () => {
+    setLoading(true);
+
     if (quizStarted) {
-      setPendingChange({ field: "restart", value: null });
+      setPendingChange({ field: "restart" });
       setOpenDialog(true);
+      setLoading(false);
       return;
     }
 
@@ -62,41 +84,37 @@ export default function QuizPage() {
     setCount(0);
     setAnswers({});
 
-    // API call
-    const data = await getQuestions({
-      amount: questions,
-      category,
-      difficulty,
-      type,
-    });
-
- 
-
-    setQuizData(data.results);
+    try {
+      const data = await getQuestions({
+        amount: questions,
+        category,
+        difficulty,
+        type,
+      });
+      setQuizData(prepareQuestions(data.results || []));
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-
-  // Confirm filter change
+  // --- confirm dialog ---
   const handleConfirmChange = () => {
-    if (pendingChange?.field === "restart") {
-      resetQuiz();
-    } else if (pendingChange) {
+    if (pendingChange?.field === "restart") resetQuiz();
+    else if (pendingChange) {
       updateFilter(pendingChange.field, pendingChange.value);
       resetQuiz();
     }
-
     setOpenDialog(false);
     setPendingChange(null);
   };
 
   const resetQuiz = () => {
-    setCategory("any");
-    setDifficulty("any");
-    setType("any");
-    setQuestions(5);
     setQuizStarted(false);
     setCount(0);
     setAnswers({});
+    setQuizData([]);
   };
 
   const handleCancelChange = () => {
@@ -104,147 +122,268 @@ export default function QuizPage() {
     setPendingChange(null);
   };
 
+  // --- submit quiz ---
+  const handleSubmit = () => {
+    navigate("/result", {
+      state: { quizData, answers, totalQuestions: questions },
+    });
+  };
+
   return (
-    <Box className="quiz-container">
+    <Box
+      sx={{
+        position: "relative",
+        minHeight: "100vh",
+        p: 4,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        background: "linear-gradient(135deg, #639597ff, #89d7b9ff)",
+      }}
+    >
+      {/* loader */}
+      {loading && (
+        <Box
+          sx={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(255,255,255,0.6)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <Loader />
+        </Box>
+      )}
+
+      {/* warning dialog */}
       <WarningDialog
         open={openDialog}
         onConfirm={handleConfirmChange}
         onCancel={handleCancelChange}
       />
 
-      {/* filter */}
+      {/* filters + button layout */}
+
       <Grid
         container
-        spacing={3}
-        justifyContent="center"
-        className="filter-grid"
+        spacing={2}
+        sx={{ maxWidth: 1200, mb: 4, alignItems: "start" }}
       >
-        {/* cat...*/}
-        <Grid item xs={6} sm={3}>
-          <CustomSelect
-            label="Category"
-            value={category}
-            onChange={(e) => handleFilterChange("category", e.target.value)}
-            options={[
-              { value: "any", label: "Any Category" },
-              { value: "9", label: "General Knowledge" },
-              { value: "10", label: "Books" },
-              { value: "11", label: "Film" },
-              { value: "12", label: "Sports" },
-            ]}
-          />
+        {/* filters left */}
+        <Grid item xs={12} sm={8} container spacing={2}>
+          <Grid item xs={6} sm={3}>
+            <CustomSelect
+              label="Category"
+              value={category}
+              onChange={(e) => handleFilterChange("category", e.target.value)}
+              options={[
+                { value: "any", label: "Any Category" },
+                { value: "9", label: "General Knowledge" },
+                { value: "10", label: "Books" },
+                { value: "11", label: "Film" },
+                { value: "12", label: "Sports" },
+              ]}
+              sx={{ minWidth: 100 }}
+            />
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <CustomSelect
+              label="Difficulty"
+              value={difficulty}
+              onChange={(e) => handleFilterChange("difficulty", e.target.value)}
+              options={[
+                { value: "any", label: "Any Difficulty" },
+                { value: "easy", label: "Easy" },
+                { value: "medium", label: "Medium" },
+                { value: "hard", label: "Hard" },
+              ]}
+              sx={{ minWidth: 100 }}
+            />
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <CustomSelect
+              label="Type"
+              value={type}
+              onChange={(e) => handleFilterChange("type", e.target.value)}
+              options={[
+                { value: "any", label: "Any type" },
+                { value: "multiple", label: "Multiple choice" },
+                { value: "boolean", label: "True/False" },
+              ]}
+              sx={{ minWidth: 100 }}
+            />
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <CustomSelect
+              label="Questions"
+              value={questions}
+              onChange={(e) => handleFilterChange("questions", e.target.value)}
+              options={[5, 10, 15, 20, 25, 30].map((n) => ({
+                value: n,
+                label: n,
+              }))}
+              sx={{ minWidth: 100 }}
+            />
+          </Grid>
         </Grid>
 
-        {/* diffculity*/}
-        <Grid item xs={6} sm={3}>
-          <CustomSelect
-            label="Difficulty"
-            value={difficulty}
-            onChange={(e) => handleFilterChange("difficulty", e.target.value)}
-            options={[
-              { value: "any", label: "Any Difficulty" },
-              { value: "easy", label: "Easy" },
-              { value: "medium", label: "Medium" },
-              { value: "hard", label: "Hard" },
-            ]}
-          />
-        </Grid>
-
-        {/* type */}
-        <Grid item xs={12} sm={3}>
-          <CustomSelect
-            label="Type"
-            value={type}
-            onChange={(e) => handleFilterChange("type", e.target.value)}
-            options={[
-              { value: "any", label: "Any Type" },
-              { value: "multiple", label: "Multiple Choice" },
-              { value: "boolean", label: "True/False" },
-            ]}
-          />
-        </Grid>
-
-        {/* question*/}
-        <Grid item xs={12} sm={3}>
-          <CustomSelect
-            label="Questions"
-            value={questions}
-            onChange={(e) => handleFilterChange("questions", e.target.value)}
-            options={[5, 10, 15, 20, 25, 30].map((n) => ({
-              value: n,
-              label: n,
-            }))}
-          />
-        </Grid>
-
-        <Grid item xs={12} className="contained">
-          <Button className="start-end-btn" onClick={handleStartRestart}>
-            {quizStarted ? "Restart Quiz" : "Start Quiz"}
+        {/* button right */}
+        <Grid
+          item
+          xs={12}
+          sm={6}
+          sx={{ display: "flex", justifyContent: "flex-end" }}
+        >
+          <Button
+            onClick={handleStartRestart}
+            disabled={loading}
+            sx={{
+              borderRadius: "40px",
+              fontSize: 14,
+              fontWeight: "bold",
+              background: "linear-gradient(45deg, #ff4081, #b52da5)",
+              color: "#f3f7f9",
+              height: 50,
+              minWidth: 140,
+            }}
+          >
+            {quizStarted ? "restart quiz" : "start quiz"}
           </Button>
         </Grid>
       </Grid>
 
-      {/* quiz section */}
-      {quizStarted && (
-        <Paper className="quiz-paper" elevation={16}>
-          {/* QUESTION box*/}
-          <div className="box">
-            <p className="question-count">
-              Question {count + 1} of {questions}
-            </p>
+      {/* quiz card */}
+      {quizStarted && quizData.length > 0 && (
+        <Paper
+          elevation={16}
+          sx={{
+            width: "90%",
+            maxWidth: 650,
+            borderRadius: 2,
+            p: 3,
+            display: "flex",
+            flexDirection: "column",
+            background: "#ecfaff94",
+          }}
+        >
+          <Typography sx={{ mb: 1, fontWeight: 600, textAlign: "center" }}>
+            Question {count + 1} of {questions}
+          </Typography>
 
-         <Typography
-  variant="h6"
-  className="question-text"
-  dangerouslySetInnerHTML={{ __html: quizData[count]?.question }}
-/>
+          <Typography
+            variant="h6"
+            sx={{ mb: 2, fontWeight: 600, color: "#333", textAlign: "center" }}
+            dangerouslySetInnerHTML={{
+              __html: quizData[count]?.question || "",
+            }}
+          />
 
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 2,
+              justifyContent: "center",
+              mt: 1,
+            }}
+          >
+            {quizData[count]?.allOptions.map((opt, i) => (
+              <Button
+                key={i}
+                onClick={() => handleSelectOption(opt)}
+                variant={answers[count] === opt ? "contained" : "outlined"}
+                sx={{
+                  flex: "0 0 48%",
+                  minWidth: 120,
+                  height: 50,
+                  textTransform: "none",
+                  fontWeight: 600,
+                  mb: 1,
+                  ...(answers[count] === opt && {
+                    backgroundColor: "#00c853",
+                    color: "#fff",
+                    borderColor: "#00c853",
+                  }),
+                }}
+              >
+                <span dangerouslySetInnerHTML={{ __html: opt }} />
+              </Button>
+            ))}
+          </Box>
 
-            {/* pre next btn */}
-            <div className="nav-btns">
-              {count > 0 && (
-                <div className="btn" onClick={() => setCount(count - 1)}>
-                  Prev
-                </div>
-              )}
-              {count < questions - 1 && (
-                <div className="btn" onClick={() => setCount(count + 1)}>
-                  Next
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* all options*/}
-          {/* all options*/}
-<Box className="options-wrapper">
-  {(type === "boolean" ? ["True", "False"] : options).map((opt, i) => (
-    <Button
-      key={i}
-      variant="outlined"
-      className={`option-btn ${answers[count] === opt ? "selected" : ""}`}
-      onClick={() => handleSelectOption(opt)}
-    >
-      {opt}
-    </Button>
-  ))}
-</Box>
-
-{/* submit only last question */}
-{count === questions - 1 && (
-  <Box className="submit-wrapper">
-    <Button
-  variant="contained"
-  color="success"
-  className="submit-btn"
-  onClick={() =>
-    navigate("/result")
-  }
+           <Box
+  sx={{
+    display: "flex",
+    gap: 1,
+    mt: 2,
+    justifyContent: "center",
+    flexWrap: "wrap",
+  }}
 >
-  Submit
-</Button>
-  </Box>
-)}
+  {/* Prev Button */}
+  {count > 0 && (
+    <Button
+      variant="contained"          
+      onClick={() => setCount((c) => c - 1)}
+      sx={{
+        backgroundColor: "#0d6efd",  
+        color: "#fff",
+        "&:hover": {
+          backgroundColor: "#0b5ed7",
+        },
+      }}
+    >
+      prev
+    </Button>
+  )}
+
+  {/* Next Button */}
+  {count < questions - 1 && (
+    <>
+      <Button
+        variant="contained"
+        onClick={() => setCount((c) => c + 1)}
+        sx={{
+          backgroundColor: "#198754", 
+          color: "#fff",
+          "&:hover": {
+            backgroundColor: "#157347",
+          },
+        }}
+      >
+        next
+      </Button>
+
+      {/* Skip Button */}
+      {!answers[count] && (
+        <Button
+          variant="outlined"
+          color="error"
+          onClick={handleSkip}
+        >
+          skip
+        </Button>
+      )}
+    </>
+  )}
+
+  {/* Submit Button */}
+  {count === questions - 1 && (
+    <Button
+      variant="contained"
+      color="success"
+      onClick={handleSubmit}
+    >
+      submit
+    </Button>
+  )}
+</Box>
 
         </Paper>
       )}

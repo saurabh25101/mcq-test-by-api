@@ -1,7 +1,7 @@
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 
 export default function CustomSelect({ label, value, onChange, options }) {
-  const FIXED_WIDTH = 120;
+  const FIXED_WIDTH = 150;
 
   return (
     <FormControl sx={{ width: FIXED_WIDTH }}>
