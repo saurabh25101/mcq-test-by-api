@@ -2,6 +2,7 @@
 import { Box, Card, CardContent, Typography, Button, Divider } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
+import DownloadIcon from "@mui/icons-material/Download";
 
 export default function ResultPage() {
   const location = useLocation();
@@ -112,17 +113,31 @@ const downloadPDF = () => {
             {score} / {totalPossible}
           </Typography>
 
-          <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-            <Button variant="contained" onClick={() => navigate("/")}>
-              Home
-            </Button>
-            <Button variant="contained" onClick={() => navigate(-1)}>
-          Restart
-            </Button>
-            <Button variant="contained" color="success" onClick={downloadPDF}>
-              Download PDF
-            </Button>
-          </Box>
+          <Box
+  sx={{
+    display: "flex",
+    gap: 1,
+    flexWrap: "wrap",
+    justifyContent: "center", // center buttons horizontally
+    mt: 2, // optional margin-top
+  }}
+>
+  <Button variant="contained" onClick={() => navigate("/")}>
+    Home
+  </Button>
+  <Button variant="contained" onClick={() => navigate(-1)}>
+    Restart
+  </Button>
+  <Button
+    variant="contained"
+    color="success"
+    endIcon={<DownloadIcon />}
+    onClick={downloadPDF}
+  >
+    See Result
+  </Button>
+</Box>
+
         </CardContent>
       </Card>
     </Box>

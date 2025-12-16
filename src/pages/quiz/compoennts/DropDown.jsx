@@ -1,22 +1,19 @@
-import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+ import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 
 export default function CustomSelect({ label, value, onChange, options }) {
-  const FIXED_WIDTH = 150;
-
   return (
-    <FormControl sx={{ width: FIXED_WIDTH }}>
+    <FormControl fullWidth sx={{ minWidth:"auto" }}>
       <InputLabel>{label}</InputLabel>
 
       <Select
         value={value}
         onChange={onChange}
         label={label}
-        sx={{ width: FIXED_WIDTH }}
+        fullWidth
         MenuProps={{
           PaperProps: {
             sx: {
-              width: FIXED_WIDTH,
-              maxHeight: 150,
+              maxHeight: 180,
               overflowY: "auto",
             },
           },
