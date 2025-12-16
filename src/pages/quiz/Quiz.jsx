@@ -125,10 +125,11 @@ export default function QuizPage() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        background: "linear-gradient(45deg, #ff4081, #7c4dff)",
+       background: "linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%)",
+
         overflowX: "hidden",
         backgroundSize: "400% 400%",
-        animation: "gradientBG 15s ease infinite",
+      
       }}
     >
       {loading && (
@@ -265,7 +266,7 @@ export default function QuizPage() {
               bgcolor: "#111827",
               color: "#fff",
               boxShadow: "0 8px 25px rgba(0,0,0,0.35)",
-              textTransform: "uppercase",
+             textTransform: "none",
               letterSpacing: 1,
               transition: "0.3s",
               "&:hover": { bgcolor: "#1e293b", transform: "scale(1.05)" },
@@ -277,131 +278,126 @@ export default function QuizPage() {
       </Box>
 
       {/* QUESTION CARD */}
-      {quizStarted && quizData.length > 0 && (
-        <Paper
+   {quizStarted && quizData.length > 0 && (
+  <Paper
+    sx={{
+      width: "100%",
+      maxWidth: 700,
+      p: { xs: 2, sm: 4 },
+      borderRadius: 5,
+      backgroundColor: "#ffffff",
+      boxShadow: "0 30px 60px rgba(10, 88, 255, 0.25)",
+      border: "1px solid #7a87b9ff",
+      backdropFilter: "blur(12px)",
+      display: "flex",
+      flexDirection: "column",
+      gap: 1.5,
+    }}
+  >
+    {/* QUESTION NUMBER */}
+    <Typography align="right">
+      <span style={{ color: "#7f8ea8ff", fontSize: "1.2rem" }}>Question</span>{" "}
+      <b style={{ fontSize: "1.2rem", color: "#3b404aff" }}>{count + 1}</b>{" "}
+      <span style={{ color: "#647491ff", fontSize: "1.2rem" }}>
+        of {questions}
+      </span>
+    </Typography>
+
+    {/* QUESTION TEXT */}
+    <Typography
+      align="center"
+      sx={{
+        mt: 2,
+        fontWeight: 700,
+        lineHeight: 2,
+        fontSize: { xs: "1rem", md: "1.2rem" },
+      }}
+      dangerouslySetInnerHTML={{ __html: quizData[count]?.question }}
+    />
+
+    {/* OPTIONS */}
+    <Box
+      sx={{
+        mt: 1,
+        display: "grid",
+        gridTemplateColumns: { xs: "1fr 1fr", sm: "1fr 1fr" },
+        gap: 2,
+      }}
+    >
+      {quizData[count]?.allOptions.map((opt, i) => (
+        <Button
+          key={i}
+          fullWidth
+          onClick={() => handleSelectOption(opt)}
+          variant={answers[count] === opt ? "contained" : "outlined"}
           sx={{
-            width: "100%",
-            maxWidth: 600,
-            p: { xs: 1, sm: 4 },
-            borderRadius: 2,
-            background: "rgba(232, 219, 219, 0.85)",
-            backdropFilter: "blur(10px)",
-            boxShadow: "0 20px 50px rgba(0,0,0,0.2)",
-            display: "flex",
-            flexDirection: "column",
-            gap: 1,
-            mx: { xs: 3, sm: "auto" },
+            textTransform: "none",
+            fontWeight: 600,
+            borderRadius: 5,
+            padding: 2,
+            "&:hover": { transform: "scale(1.03)" },
+            whiteSpace: "normal",
+            wordBreak: "break-word",
+            bgcolor: answers[count] === opt ? "#0f172a" : "#ffffff",
+            color: answers[count] === opt ? "#ffffff" : "#111827",
+            boxShadow:
+              answers[count] === opt
+                ? "0 6px 20px rgba(0,0,0,0.3)"
+                : "0 4px 12px rgba(0,0,0,0.1)",
           }}
         >
-          <Typography
-            align="center"
-            fontWeight={700}
-            fontSize={{ xs: "1.1rem", md: "1.3rem" }}
-          >
-            Question {count + 1} of {questions}
-          </Typography>
+          <span dangerouslySetInnerHTML={{ __html: opt }} />
+        </Button>
+      ))}
+    </Box>
 
-          <Typography
-            align="center"
-            sx={{
-              fontWeight: 600,
-              lineHeight: 1.8,
-              fontSize: { xs: "1rem", md: "1.2rem" },
-            }}
-            dangerouslySetInnerHTML={{ __html: quizData[count]?.question }}
-          />
+    {/* NAVIGATION BUTTONS */}
+    <Box
+      sx={{
+        mt: 2,
+        display: "flex",
+        gap: 2,
+        justifyContent: "center",
+        flexWrap: "wrap",
+      }}
+    >
+      {count > 0 && (
+        <Button variant="outlined" onClick={() => setCount((c) => c - 1)}>
+          Prev
+        </Button>
+      )}
 
-          <Box
-            sx={{
-              mt: 1,
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr 1fr", sm: "1fr 1fr" },
-              gap: 2,
-            }}
+      {count < questions - 1 && (
+        <>
+          <Button
+            variant="contained"
+            onClick={() => setCount((c) => c + 1)}
+            disabled={!answers[count]}
           >
-            {quizData[count]?.allOptions.map((opt, i) => (
-              <Button
-  key={i}
-  fullWidth
-  onClick={() => handleSelectOption(opt)}
-  variant={answers[count] === opt ? "contained" : "outlined"}
-  sx={{
-    textTransform: "none",
-    fontWeight: 600,
-    borderRadius: 4,
-    padding: 2,
-    transition: "0.3s",
-    "&:hover": { transform: "scale(1.03)" },
+            Next
+          </Button>
+
+          <Button
+            variant="outlined"
+            color="error"
+            disabled={!!answers[count]}
+            onClick={handleSkip}
+          >
+            Skip
+          </Button>
+        </>
+      )}
+
+      {count === questions - 1 && (
+        <Button variant="contained" color="success" onClick={handleSubmit}>
+          Submit
+        </Button>
+      )}
+    </Box>
+  </Paper>
+)}
 
     
-    whiteSpace: "normal",         
-    wordBreak: "break-word",     
-
-    bgcolor:
-      answers[count] === opt
-        ? "#0f172a"
-        : "rgba(255,255,255,0.8)",
-    color: answers[count] === opt ? "#c69b9bff" : "#111827",
-    boxShadow:
-      answers[count] === opt
-        ? "0 6px 20px rgba(0,0,0,0.3)"
-        : "0 4px 12px rgba(0,0,0,0.1)",
-  }}
->
-  <span dangerouslySetInnerHTML={{ __html: opt }} />
-</Button>
-
-            ))}
-          </Box>
-
-          <Box
-            sx={{
-              mt: 2,
-              display: "flex",
-              gap: 2,
-              justifyContent: "center",
-              flexWrap: "wrap",
-            }}
-          >
-            {count > 0 && (
-              <Button variant="outlined" onClick={() => setCount((c) => c - 1)}>
-                Prev
-              </Button>
-            )}
-
-            {count < questions - 1 && (
-              <>
-               <Button
-  variant="contained"
-  onClick={() => setCount((c) => c + 1)}
-  disabled={!answers[count]} 
->
-  Next
-</Button>
-
-                <Button
-                  variant="outlined"
-                  color="error"
-                  disabled={!!answers[count]}
-                  onClick={handleSkip}
-                >
-                  Skip
-                </Button>
-              </>
-            )}
-
-            {count === questions - 1 && (
-              <Button
-                variant="contained"
-                color="success"
-                onClick={handleSubmit}
-              >
-                Submit
-              </Button>
-            )}
-          </Box>
-        </Paper>
-      )}
     </Box>
   );
 }

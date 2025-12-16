@@ -2,7 +2,7 @@
 
 export default function CustomSelect({ label, value, onChange, options }) {
   return (
-    <FormControl fullWidth sx={{ minWidth:"auto" }}>
+    <FormControl fullWidth size="small">
       <InputLabel>{label}</InputLabel>
 
       <Select
@@ -10,11 +10,17 @@ export default function CustomSelect({ label, value, onChange, options }) {
         onChange={onChange}
         label={label}
         fullWidth
+
+        // 🔽 SELECT HEIGHT CONTROL
+        sx={{
+          height:50,
+          fontSize: "0.9rem",
+        }}
+
         MenuProps={{
           PaperProps: {
             sx: {
-              maxHeight: 180,
-              overflowY: "auto",
+              maxHeight: 170,  
             },
           },
         }}
@@ -23,7 +29,11 @@ export default function CustomSelect({ label, value, onChange, options }) {
           <MenuItem
             key={opt.value}
             value={opt.value}
-            sx={{ whiteSpace: "normal" }}
+            sx={{
+              fontSize: "0.9rem",
+              py: 0.8,  
+              whiteSpace: "normal",
+            }}
           >
             {opt.label}
           </MenuItem>

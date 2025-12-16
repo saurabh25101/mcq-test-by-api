@@ -90,7 +90,7 @@ const downloadPDF = () => {
         background: "linear-gradient(135deg,#7b2ff7,#f107a3)",
       }}
     >
-      <Card sx={{ width: 520, borderRadius: 2 }}>
+      <Card sx={{ width: 520, borderRadius: 5 }}>
         <CardContent
           sx={{
             display: "flex",
@@ -103,7 +103,7 @@ const downloadPDF = () => {
           <Typography variant="h4">🎉 Quiz Results</Typography>
           <Divider sx={{ width: "100%", my: 1 }} />
 
-          <Typography variant="body1">Total Questions: {totalQuestions}</Typography>
+          <Typography variant="body1" >Total Questions: {totalQuestions}</Typography>
           <Typography variant="body1">Attempted: {attemptedCount}</Typography>
           <Typography variant="body1">Skipped: {skippedCount}</Typography>
           <Typography variant="body1">Correct: {correctCount}</Typography>
@@ -118,8 +118,9 @@ const downloadPDF = () => {
     display: "flex",
     gap: 1,
     flexWrap: "wrap",
-    justifyContent: "center", // center buttons horizontally
-    mt: 2, // optional margin-top
+    justifyContent: "center",  
+    mt: 2, 
+    
   }}
 >
   <Button variant="contained" onClick={() => navigate("/")}>
